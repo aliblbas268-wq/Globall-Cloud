@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ئەدمین — Global Cloud Logistics</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#08111f;--deep:#0c1a30;--card:#0f2040;--card2:#132545;
+  --gold:#c9a84c;--gold2:#e8c96a;
+  --sky:#1e90d4;--sky2:#4fb3f0;
+  --green:#22c55e;--red:#ef4444;--orange:#f59e0b;
+  --white:#f0f4ff;--gray:#7a93b8;--border:rgba(201,168,76,.18);
+  --radius:14px;--shadow:0 8px 32px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--navy);color:var(--white);min-height:100vh}
+
+/* ─── AUTH ─── */
+#admin-login{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:40px 20px;
+  background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(30,144,212,.1),transparent),var(--navy);
+}
+.admin-login-box{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:20px;padding:36px 28px;width:100%;max-width:400px;
+}
+.admin-badge{
+  text-align:center;margin-bottom:28px;
+}
+.admin-badge .icon{
+  width:70px;height:70px;background:linear-gradient(135deg,var(--gold),var(--sky));
+  border-radius:18px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:36px;
+  box-shadow:0 0 30px rgba(201,168,76,.3);
+}
+.admin-badge h2{font-size:22px;font-weight:900}
+.admin-badge p{color:var(--gray);font-size:13px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;color:var(--gray);margin-bottom:7px;font-weight:600}
+.field input{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:13px 16px;color:var(--white);
+  font-family:'Tajawal',sans-serif;font-size:15px;outline:none;transition:.3s;
+}
+.field input:focus{border-color:var(--gold)}
+.field input::placeholder{color:var(--gray)}
+.err{color:var(--red);font-size:13px;margin-bottom:10px;display:none}
+.err.show{display:block}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:.3s}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#08111f;box-shadow:0 4px 20px rgba(201,168,76,.3)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,.5)}
+.btn-sky{background:linear-gradient(135deg,var(--sky),var(--sky2));color:#fff}
+.btn-sky:hover{transform:translateY(-2px)}
+.btn-sm{padding:8px 18px;font-size:13px;font-weight:700;border:none;border-radius:8px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:.3s}
+.btn-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.btn-green:hover{background:rgba(34,197,94,.25)}
+.btn-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.btn-red:hover{background:rgba(239,68,68,.25)}
+.btn-orange{background:rgba(245,158,11,.15);color:var(--orange);border:1px solid rgba(245,158,11,.3)}
+
+/* ─── ADMIN APP ─── */
+#admin-app{display:none;flex-direction:column;min-height:100vh}
+.admin-header{
+  background:rgba(8,17,31,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.admin-logo{display:flex;align-items:center;gap:10px}
+.admin-logo .icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold),var(--sky));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.admin-logo span{font-weight:900;font-size:17px}
+.admin-logo small{display:block;color:var(--gold);font-size:11px;letter-spacing:.1em}
+.admin-header-right{display:flex;gap:10px;align-items:center}
+.admin-nav{
+  background:rgba(12,26,48,.9);border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;gap:4px;overflow-x:auto;
+}
+.admin-nav::-webkit-scrollbar{display:none}
+.anav-btn{
+  padding:14px 18px;border:none;background:transparent;
+  color:var(--gray);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;border-bottom:2px solid transparent;transition:.3s;white-space:nowrap;
+}
+.anav-btn.active{color:var(--gold2);border-bottom-color:var(--gold)}
+.anav-btn:hover{color:var(--white)}
+.admin-content{padding:24px;flex:1}
+.apage{display:none}
+.apage.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── STATS CARDS ─── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;text-align:center;
+}
+.stat-card .sc-num{font-size:38px;font-weight:900;line-height:1}
+.stat-card .sc-label{color:var(--gray);font-size:12px;margin-top:6px;font-weight:600}
+.stat-gold .sc-num{color:var(--gold2)}
+.stat-sky .sc-num{color:var(--sky2)}
+.stat-green .sc-num{color:var(--green)}
+.stat-orange .sc-num{color:var(--orange)}
+.stat-red .sc-num{color:#f87171}
+
+/* ─── TABLE ─── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:rgba(255,255,255,.04);
+  padding:12px 14px;text-align:right;
+  color:var(--gray);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.05);transition:.2s}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+tbody td{padding:13px 14px;white-space:nowrap}
+.badge{display:inline-block;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.badge-sky{background:rgba(30,144,212,.15);color:var(--sky2)}
+.badge-ok{background:rgba(34,197,94,.15);color:#4ade80}
+.badge-warn{background:rgba(245,158,11,.15);color:var(--orange)}
+.badge-err{background:rgba(239,68,68,.15);color:#f87171}
+.actions{display:flex;gap:6px}
+
+/* ─── SECTION HEADER ─── */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-header h2{font-size:18px;font-weight:900}
+.search-bar{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:10px 14px;color:var(--white);
+  font-family:'Tajawal',sans-serif;font-size:14px;outline:none;
+  width:220px;transition:.3s;
+}
+.search-bar:focus{border-color:var(--sky);width:260px}
+.search-bar::placeholder{color:var(--gray)}
+
+/* ─── MODAL ─── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:540px;max-height:88vh;overflow-y:auto;animation:zoomIn .25s ease}
+@keyframes zoomIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.modal-title{font-size:18px;font-weight:900;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;color:var(--gray);font-size:22px;cursor:pointer}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 14px;color:var(--white);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;width:100%;transition:.3s}
+select:focus{border-color:var(--gold)}
+select option{background:var(--card)}
+textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 14px;color:var(--white);font-family:'Tajawal',sans-serif;font-size:14px;outline:none;width:100%;resize:vertical;min-height:90px}
+textarea:focus{border-color:var(--gold)}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);background:#1a3050;border:1px solid var(--sky);border-radius:10px;padding:12px 28px;font-size:14px;font-weight:700;z-index:500;opacity:0;transition:.4s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── INFO BOX ─── */
+.info-box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:12px;font-size:13px;line-height:1.9}
+.info-box b{color:var(--white)}
+.info-box span{color:var(--gray)}
+
+/* ─── ACTIVITY ─── */
+.activity-item{display:flex;gap:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
+.ac-icon{font-size:22px;min-width:36px}
+.ac-body p{font-size:13px;font-weight:600}
+.ac-body span{font-size:12px;color:var(--gray)}
+
+@media(max-width:600px){
+  .admin-content{padding:16px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  table{font-size:12px}
+  thead th,tbody td{padding:10px 8px}
+  .two-col{grid-template-columns:1fr}
+  .search-bar{width:140px}
+  .search-bar:focus{width:160px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ ADMIN LOGIN ══ -->
+<div id="admin-login">
+  <div class="admin-login-box">
+    <div class="admin-badge">
+      <div class="icon">⚙️</div>
+      <h2>پانێلی ئەدمین</h2>
+      <p>Global Cloud Logistics</p>
+    </div>
+    <div class="field">
+      <label>ئیمەیل یان تەلەفۆن</label>
+      <input id="a-id" type="text" placeholder="aliblbas697@gmail.com">
+    </div>
+    <div class="field">
+      <label>وشەی نهێنی</label>
+      <input id="a-pass" type="password" placeholder="••••••••">
+    </div>
+    <p class="err" id="a-err"></p>
+    <button class="btn btn-gold" onclick="adminLogin()">چوونەژوورەوە بۆ پانێل</button>
+    <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--gray)">
+      <a href="index.html" style="color:var(--sky2);text-decoration:none">← بگەڕێوە بۆ ئەپ</a>
+    </p>
+  </div>
+</div>
+
+<!-- ══ ADMIN APP ══ -->
+<div id="admin-app">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="admin-logo">
+      <div class="icon">☁️</div>
+      <div>
+        <span>Global Cloud</span>
+        <small>ADMIN PANEL</small>
+      </div>
+    </div>
+    <div class="admin-header-right">
+      <span id="admin-name" style="color:var(--gray);font-size:13px"></span>
+      <button class="btn-sm btn-orange" onclick="GC.logout()">چوونەدەرەوە</button>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="admin-nav">
+    <button class="anav-btn active" onclick="switchAdmin('dashboard')" id="anav-dashboard">📊 داشبۆرد</button>
+    <button class="anav-btn" onclick="switchAdmin('shipments')" id="anav-shipments">📦 بارگواستنەکان</button>
+    <button class="anav-btn" onclick="switchAdmin('users')" id="anav-users">👥 کڕیارەکان</button>
+    <button class="anav-btn" onclick="switchAdmin('new-ship')" id="anav-new-ship">➕ بارگواستنی نوێ</button>
+    <button class="anav-btn" onclick="switchAdmin('contact')" id="anav-contact">📞 پەیوەندی</button>
+  </div>
+
+  <!-- Content -->
+  <div class="admin-content">
+
+    <!-- DASHBOARD -->
+    <div id="apage-dashboard" class="apage active">
+      <div class="stats-row" id="dash-stats"></div>
+      <h3 style="margin-bottom:12px;font-size:15px;color:var(--gray)">⚡ چالاکیی دواین</h3>
+      <div id="dash-activity"></div>
+    </div>
+
+    <!-- SHIPMENTS -->
+    <div id="apage-shipments" class="apage">
+      <div class="sec-header">
+        <h2>📦 هەموو بارگواستنەکان</h2>
+        <input type="text" class="search-bar" placeholder="🔍 گەڕان..." id="ship-search" oninput="filterShipments()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>کۆد</th>
+              <th>کڕیار</th>
+              <th>جۆر</th>
+              <th>لە → بۆ</th>
+              <th>کێش</th>
+              <th>نرخ</th>
+              <th>ماوە</th>
+              <th>حاڵەت</th>
+              <th>کردارەکان</th>
+            </tr>
+          </thead>
+          <tbody id="shipments-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="apage-users" class="apage">
+      <div class="sec-header">
+        <h2>👥 کڕیارەکان</h2>
+        <input type="text" class="search-bar" placeholder="🔍 گەڕان..." id="user-search" oninput="filterUsers()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ناو</th>
+              <th>تەلەفۆن</th>
+              <th>ئیمەیل</th>
+              <th>ڕۆڵ</th>
+              <th>تاریخ</th>
+              <th>کردارەکان</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NEW SHIPMENT -->
+    <div id="apage-new-ship" class="apage">
+      <h2 style="margin-bottom:20px">➕ بارگواستنی نوێ زیادبکە</h2>
+
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:24px">
+        <div style="color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.1em;margin-bottom:14px">👤 زانیاری کڕیار</div>
+        <div class="two-col">
+          <div class="field"><label>ناوی کڕیار</label><input id="ns-cname" type="text" placeholder="ناوی تەواو"></div>
+          <div class="field"><label>ژمارەی تەلەفۆن</label><input id="ns-cphone" type="tel" placeholder="+964..."></div>
+        </div>
+
+        <div style="color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.1em;margin:18px 0 14px">📦 زانیاری بار</div>
+        <div class="two-col">
+          <div class="field">
+            <label>لە کوێ؟</label>
+            <select id="ns-from">
+              <option value="China">🏭 چین</option>
+              <option value="Dubai, UAE">🏙 دوبەی</option>
+              <option value="Sharjah, UAE">شارجە</option>
+              <option value="Other">جی تر</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>بۆ کوێ؟</label>
+            <select id="ns-to">
+              <option value="Erbil, Iraq">🏔 هەولێر</option>
+              <option value="Baghdad, Iraq">🕌 بەغداد</option>
+              <option value="Sulaymaniyah, Iraq">سلێمانی</option>
+              <option value="Duhok, Iraq">دهۆک</option>
+              <option value="Kirkuk, Iraq">کەرکووک</option>
+              <option value="Mosul, Iraq">موسڵ</option>
+              <option value="Basra, Iraq">بەسرە</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>جۆر</label>
+            <select id="ns-type">
+              <option value="air">✈️ ئاسمانی</option>
+              <option value="sea">🚢 دەریایی</option>
+              <option value="land">🚚 وشکانی</option>
+            </select>
+          </div>
+          <div class="field"><label>حاڵەت</label>
+            <select id="ns-status">
+              <option value="pending">چاوەڕوانکراو</option>
+              <option value="in_transit">لە ڕێگەیە</option>
+              <option value="delivered">گەیشت</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field"><label>کێش (کگ)</label><input id="ns-weight" type="number" placeholder="0"></div>
+          <div class="field"><label>قەبارە (CBM)</label><input id="ns-volume" type="number" step="0.1" placeholder="0.0"></div>
+        </div>
+
+        <div style="color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.1em;margin:18px 0 14px">💰 زانیاری پارە</div>
+        <div class="two-col">
+          <div class="field"><label>کۆی نرخ ($)</label><input id="ns-total" type="number" placeholder="0"></div>
+          <div class="field"><label>مافی ($)</label><input id="ns-paid" type="number" placeholder="0"></div>
+        </div>
+        <div class="field">
+          <label>ڕێگای پارەدان</label>
+          <select id="ns-payment">
+            <option value="Cash">کاش</option>
+            <option value="Bank Transfer">حوالە</option>
+            <option value="Pending">چاوەڕوانکراو</option>
+          </select>
+        </div>
+
+        <div style="color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.1em;margin:18px 0 14px">📅 کات</div>
+        <div class="two-col">
+          <div class="field"><label>تاریخی گواستنەوە</label><input id="ns-date" type="date"></div>
+          <div class="field"><label>تاریخی گەیاندن (چاوەڕوان)</label><input id="ns-delivery" type="date"></div>
+        </div>
+        <div class="field"><label>تێبینی</label><textarea id="ns-notes" placeholder="هەر زانیاری زیادەی هەیت..."></textarea></div>
+
+        <button class="btn btn-gold" onclick="adminCreateShipment()">✅ دروستکردن</button>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div id="apage-contact" class="apage">
+      <h2 style="margin-bottom:20px">📞 زانیاری پەیوەندی</h2>
+      <div class="info-box">
+        <div style="margin-bottom:10px"><span>واتساپ:</span> <b>+964 750 757 7137</b></div>
+        <div style="margin-bottom:10px"><span>تەلەفۆن:</span> <b>+964 750 757 7137</b></div>
+        <div><span>ئیمەیل:</span> <b>aliblbas697@gmail.com</b></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+        <a href="https://wa.me/9647507577137" target="_blank" class="btn-sm btn-green" style="text-decoration:none;padding:10px 20px">💬 واتساپ</a>
+        <a href="mailto:aliblbas697@gmail.com" class="btn-sm btn-sky" style="text-decoration:none;padding:10px 20px;background:rgba(30,144,212,.15);color:var(--sky2);border:1px solid rgba(30,144,212,.3)">✉️ ئیمەیل</a>
+        <a href="tel:+9647507577137" class="btn-sm btn-orange" style="text-decoration:none;padding:10px 20px">📞 پەیوەندی</a>
+      </div>
+
+      <h3 style="margin:24px 0 14px;font-size:16px">⚙️ ئەکاونتی ئەدمین</h3>
+      <div class="info-box">
+        <div><span>ئیمەیل:</span> <b>aliblbas697@gmail.com</b></div>
+        <div style="margin-top:6px"><span>وشەی نهێنی:</span> <b>admin2024</b> <span style="color:var(--orange);font-size:12px">(گۆڕینی پێشنیازدەکرێت)</span></div>
+      </div>
+    </div>
+
+  </div><!-- /admin-content -->
+</div><!-- /admin-app -->
+
+<!-- EDIT SHIPMENT MODAL -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-title">
+      ✏️ دەستکاری بارگواستن
+      <button class="modal-close" onclick="closeModal('modal-edit')">✕</button>
+    </div>
+    <div id="edit-content"></div>
+  </div>
+</div>
+
+<!-- VIEW DETAIL MODAL -->
+<div class="modal-overlay" id="modal-view">
+  <div class="modal">
+    <div class="modal-title">
+      📦 وردەکاری بار
+      <button class="modal-close" onclick="closeModal('modal-view')">✕</button>
+    </div>
+    <div id="view-content"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+<script>
+// ── ADMIN LOGIN ──────────────────────────────────────
+function adminLogin() {
+  const id = document.getElementById('a-id').value.trim();
+  const pw = document.getElementById('a-pass').value;
+  const err = document.getElementById('a-err');
+  const r = GC.login(id, pw);
+  if (!r.ok) { err.textContent = r.msg; err.classList.add('show'); return; }
+  if (r.user.role !== 'admin') { err.textContent = 'تەنها ئەدمین دەتوانێت بچێتە ژوورەوە'; err.classList.add('show'); GC.logout(); return; }
+  initAdminApp(r.user);
+}
+
+function initAdminApp(u) {
+  document.getElementById('admin-login').style.display = 'none';
+  document.getElementById('admin-app').style.display = 'flex';
+  document.getElementById('admin-name').textContent = u.name;
+  renderDashboard();
+  renderShipments();
+  renderUsers();
+  setTodayDates();
+}
+
+// ── AUTO LOGIN ────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{
+  const u = GC.currentUser();
+  if (u && u.role === 'admin') initAdminApp(u);
+});
+
+// ── NAV ──────────────────────────────────────────────
+function switchAdmin(tab) {
+  document.querySelectorAll('.apage').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.anav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('apage-'+tab).classList.add('active');
+  document.getElementById('anav-'+tab).classList.add('active');
+}
+
+// ── DASHBOARD ────────────────────────────────────────
+function renderDashboard() {
+  const s = GC.getShipments();
+  const u = GC.getUsers().filter(x=>x.role==='customer');
+  const totalRev   = s.reduce((a,b)=>a+(b.totalAmount||0),0);
+  const totalDue   = s.reduce((a,b)=>a+(b.dueAmount||0),0);
+  const inTransit  = s.filter(x=>x.status==='in_transit').length;
+  const delivered  = s.filter(x=>x.status==='delivered').length;
+  const pending    = s.filter(x=>x.status==='pending').length;
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card stat-gold"><div class="sc-num">${s.length}</div><div class="sc-label">کۆی بارگواستن</div></div>
+    <div class="stat-card stat-sky"><div class="sc-num">${inTransit}</div><div class="sc-label">لە ڕێگەیە</div></div>
+    <div class="stat-card stat-green"><div class="sc-num">${delivered}</div><div class="sc-label">گەیشتووە</div></div>
+    <div class="stat-card stat-orange"><div class="sc-num">${pending}</div><div class="sc-label">چاوەڕوانکراو</div></div>
+    <div class="stat-card stat-sky"><div class="sc-num">${u.length}</div><div class="sc-label">کڕیار</div></div>
+    <div class="stat-card stat-gold"><div class="sc-num">$${(totalRev/1000).toFixed(1)}K</div><div class="sc-label">کۆی داهات</div></div>
+    <div class="stat-card stat-red"><div class="sc-num">$${(totalDue/1000).toFixed(1)}K</div><div class="sc-label">کۆی ماوە</div></div>
+  `;
+
+  document.getElementById('dash-activity').innerHTML = s.slice(0,5).map(x=>`
+    <div class="activity-item">
+      <div class="ac-icon">${GC.typeIcon(x.type)}</div>
+      <div class="ac-body">
+        <p><b>${x.id}</b> — ${x.customerName||'—'} — ${x.from} → ${x.to}</p>
+        <span>${x.orderDate} · <span class="badge ${GC.statusClass(x.status)}">${GC.statusLabel(x.status)}</span></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SHIPMENTS ─────────────────────────────────────────
+function renderShipments(filter='') {
+  let s = GC.getShipments();
+  if (filter) s = s.filter(x=>
+    x.id.toLowerCase().includes(filter) ||
+    (x.customerName||'').toLowerCase().includes(filter) ||
+    (x.customerPhone||'').includes(filter)
+  );
+  document.getElementById('shipments-tbody').innerHTML = s.map(x=>`
+    <tr>
+      <td><b>${x.id}</b></td>
+      <td>
+        <div style="font-weight:600">${x.customerName||'—'}</div>
+        <div style="color:var(--gray);font-size:11px">${x.customerPhone||''}</div>
+      </td>
+      <td>${GC.typeLabel(x.type)}</td>
+      <td style="font-size:12px">${x.from}<br><span style="color:var(--sky2)">→ ${x.to}</span></td>
+      <td>${x.weight} کگ</td>
+      <td style="color:var(--gold2);font-weight:700">${GC.formatMoney(x.totalAmount)}</td>
+      <td style="color:${x.dueAmount>0?'var(--red)':'var(--green)'};font-weight:700">${GC.formatMoney(x.dueAmount)}</td>
+      <td><span class="badge ${GC.statusClass(x.status)}">${GC.statusLabel(x.status)}</span></td>
+      <td>
+        <div class="actions">
+          <button class="btn-sm btn-green" onclick="viewShipment('${x.id}')">👁</button>
+          <button class="btn-sm btn-orange" onclick="editShipment('${x.id}')">✏️</button>
+          <button class="btn-sm btn-red" onclick="deleteShipmentAdmin('${x.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--gray)">هیچ بارگواستنێک نەدۆزرایەوە</td></tr>`;
+}
+
+function filterShipments() {
+  renderShipments(document.getElementById('ship-search').value.trim().toLowerCase());
+}
+
+function deleteShipmentAdmin(id) {
+  if (!confirm('دڵنیایت لە سڕینەوەی ' + id + '؟')) return;
+  GC.deleteShipment(id);
+  renderShipments(); renderDashboard();
+  showToast('🗑 بارگواستن سڕایەوە');
+}
+
+// ── VIEW SHIPMENT ─────────────────────────────────────
+function viewShipment(id) {
+  const s = GC.getShipmentById(id);
+  if (!s) return;
+  document.getElementById('view-content').innerHTML = `
+    <div class="info-box">
+      <div><span>کۆد:</span> <b>${s.id}</b> &nbsp;&nbsp; <span class="badge ${GC.statusClass(s.status)}">${GC.statusLabel(s.status)}</span></div>
+      <div><span>کڕیار:</span> <b>${s.customerName||'—'}</b> · ${s.customerPhone||''}</div>
+      <div><span>ڕێگا:</span> <b>${GC.typeLabel(s.type)}</b></div>
+      <div><span>لە → بۆ:</span> <b>${s.from} → ${s.to}</b></div>
+      <div><span>کێش:</span> <b>${s.weight} کگ</b> · قەبارە: <b>${s.volume} CBM</b></div>
+      <div><span>تاریخ:</span> <b>${s.orderDate}</b> · گەیاندن: <b>${s.estimatedDelivery||'—'}</b></div>
+      <div><span>کۆی نرخ:</span> <b style="color:var(--gold2)">${GC.formatMoney(s.totalAmount)}</b></div>
+      <div><span>مافی:</span> <b style="color:var(--green)">${GC.formatMoney(s.paidAmount)}</b> · ماوە: <b style="color:var(--red)">${GC.formatMoney(s.dueAmount)}</b></div>
+      <div><span>پارەدان:</span> <b>${s.paymentMethod}</b></div>
+      ${s.notes ? `<div><span>تێبینی:</span> <b>${s.notes}</b></div>` : ''}
+    </div>
+    <div style="margin-top:12px"><b>⏱ ژمارەی کاتی</b></div>
+    ${s.timeline.map(t=>`
+      <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:18px">${t.done?'✅':'⭕'}</span>
+        <div>
+          <div style="font-size:13px;font-weight:700">${t.event}</div>
+          <div style="font-size:11px;color:var(--gray)">${t.date||'چاوەڕوانکراوە'}</div>
+        </div>
+      </div>
+    `).join('')}
+    <div style="margin-top:16px">
+      <a href="https://wa.me/9647507577137?text=سڵاو، دەربارەی بارگواستنی ${s.id}" target="_blank" class="btn btn-green" style="display:block;text-align:center;text-decoration:none;padding:12px;border-radius:10px;background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);font-weight:700">💬 پەیوەندی بە کڕیار</a>
+    </div>
+  `;
+  openModal('modal-view');
+}
+
+// ── EDIT SHIPMENT ─────────────────────────────────────
+function editShipment(id) {
+  const s = GC.getShipmentById(id);
+  if (!s) return;
+  document.getElementById('edit-content').innerHTML = `
+    <div class="field"><label>حاڵەت</label>
+      <select id="e-status">
+        ${['pending','in_transit','delivered','cancelled'].map(v=>`<option value="${v}" ${v===s.status?'selected':''}>${GC.statusLabel(v)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="two-col">
+      <div class="field"><label>کۆی نرخ ($)</label><input id="e-total" type="number" value="${s.totalAmount}"></div>
+      <div class="field"><label>مافی ($)</label><input id="e-paid" type="number" value="${s.paidAmount}"></div>
+    </div>
+    <div class="field"><label>ڕێگای پارەدان</label>
+      <select id="e-payment">
+        ${['Cash','Bank Transfer','Pending'].map(v=>`<option ${v===s.paymentMethod?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>تاریخی گەیاندن</label><input id="e-delivery" type="date" value="${s.estimatedDelivery||''}"></div>
+    <div class="field"><label>تێبینی</label><textarea id="e-notes">${s.notes||''}</textarea></div>
+    <div style="margin-top:4px"><b>⏱ نوێکردنەوەی ژمارەی کاتی</b></div>
+    ${s.timeline.map((t,i)=>`
+      <div style="display:flex;gap:10px;align-items:center;padding:8px;background:rgba(255,255,255,.03);border-radius:8px;margin-top:6px">
+        <input type="checkbox" id="tl-${i}" ${t.done?'checked':''} style="width:18px;height:18px;cursor:pointer">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">${t.event}</div>
+          <input type="date" id="tl-date-${i}" value="${t.date||''}" style="margin-top:4px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--white);font-family:'Tajawal',sans-serif;font-size:12px;outline:none">
+        </div>
+      </div>
+    `).join('')}
+    <button class="btn btn-gold" style="margin-top:16px" onclick="saveEdit('${id}')">💾 پاشەکەوتکردن</button>
+  `;
+  openModal('modal-edit');
+}
+
+function saveEdit(id) {
+  const s = GC.getShipmentById(id);
+  const total = +document.getElementById('e-total').value;
+  const paid  = +document.getElementById('e-paid').value;
+  const newTimeline = s.timeline.map((t,i)=>({
+    ...t,
+    done: document.getElementById(`tl-${i}`)?.checked || false,
+    date: document.getElementById(`tl-date-${i}`)?.value || ''
+  }));
+  GC.updateShipment(id, {
+    status:  document.getElementById('e-status').value,
+    totalAmount: total,
+    paidAmount: paid,
+    dueAmount: Math.max(0, total - paid),
+    paymentMethod: document.getElementById('e-payment').value,
+    estimatedDelivery: document.getElementById('e-delivery').value,
+    notes: document.getElementById('e-notes').value,
+    timeline: newTimeline
+  });
+  closeModal('modal-edit');
+  renderShipments(); renderDashboard();
+  showToast('✅ بارگواستن نوێکرایەوە');
+}
+
+// ── USERS ─────────────────────────────────────────────
+function renderUsers(filter='') {
+  let u = GC.getUsers().filter(x=>x.role==='customer');
+  if (filter) u = u.filter(x=>
+    x.name.toLowerCase().includes(filter) ||
+    (x.phone||'').includes(filter) ||
+    (x.email||'').toLowerCase().includes(filter)
+  );
+  document.getElementById('users-tbody').innerHTML = u.map(x=>`
+    <tr>
+      <td><b>${x.name}</b></td>
+      <td>${x.phone||'—'}</td>
+      <td style="color:var(--gray)">${x.email||'—'}</td>
+      <td><span class="badge badge-sky">کڕیار</span></td>
+      <td style="color:var(--gray)">${x.createdAt||'—'}</td>
+      <td>
+        <div class="actions">
+          <a href="https://wa.me/${(x.phone||'').replace(/\D/g,'')}" target="_blank" class="btn-sm btn-green" style="text-decoration:none">💬</a>
+          <button class="btn-sm btn-red" onclick="deleteUserAdmin('${x.id}','${x.name}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray)">هیچ کڕیارێک نەدۆزرایەوە</td></tr>`;
+}
+
+function filterUsers() {
+  renderUsers(document.getElementById('user-search').value.trim().toLowerCase());
+}
+
+function deleteUserAdmin(id, name) {
+  if (!confirm('دڵنیایت لە سڕینەوەی ' + name + '؟')) return;
+  GC.deleteUser(id);
+  renderUsers(); renderDashboard();
+  showToast('🗑 کڕیار سڕایەوە');
+}
+
+// ── NEW SHIPMENT ──────────────────────────────────────
+function setTodayDates() {
+  const t = new Date().toISOString().split('T')[0];
+  document.getElementById('ns-date').value = t;
+}
+
+function adminCreateShipment() {
+  const total = +document.getElementById('ns-total').value || 0;
+  const paid  = +document.getElementById('ns-paid').value || 0;
+  const s = GC.createShipment({
+    customerName:  document.getElementById('ns-cname').value,
+    customerPhone: document.getElementById('ns-cphone').value,
+    from:     document.getElementById('ns-from').value,
+    to:       document.getElementById('ns-to').value,
+    type:     document.getElementById('ns-type').value,
+    weight:   document.getElementById('ns-weight').value || '0',
+    volume:   document.getElementById('ns-volume').value || '0',
+    totalAmount: total,
+    paidAmount: paid,
+    dueAmount: Math.max(0, total - paid),
+    paymentMethod: document.getElementById('ns-payment').value,
+    orderDate: document.getElementById('ns-date').value,
+    estimatedDelivery: document.getElementById('ns-delivery').value,
+    notes: document.getElementById('ns-notes').value,
+    userId: null
+  });
+  // override status
+  GC.updateShipment(s.id, { status: document.getElementById('ns-status').value });
+  showToast('✅ بارگواستنی نوێ دروستکرا: ' + s.id);
+  renderShipments(); renderDashboard();
+  switchAdmin('shipments');
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); });
+});
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
